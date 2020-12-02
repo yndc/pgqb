@@ -30,9 +30,13 @@ func (b *ConditionBuilder) Or(str string, args ...interface{}) {
 	fmt.Fprintf(b.str, str, args...)
 }
 
+func (b *ConditionBuilder) String() string {
+	return fmt.Sprintf(`( %s )`, b.str.String())
+}
+
 // Condition creates a condition query
 func Condition(query func(builder *ConditionBuilder)) string {
 	builder := &ConditionBuilder{}
 	query(builder)
-	return fmt.Sprintf(`( %s )`, builder.str.String())
+	return builder.String()
 }
