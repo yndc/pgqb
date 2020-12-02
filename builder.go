@@ -24,11 +24,53 @@ func NewBuilder() *Builder {
 	return &Builder{}
 }
 
+// Copy copies an existing builder
+func (b *Builder) Copy() *Builder {
+	newBuilder := &Builder{}
+	if b.selects != nil {
+		newBuilder.selects = &strings.Builder{}
+		newBuilder.selects.WriteString(b.selects.String())
+	}
+	if b.from != nil {
+		newBuilder.from = &strings.Builder{}
+		newBuilder.from.WriteString(b.from.String())
+	}
+	if b.joins != nil {
+		newBuilder.joins = &strings.Builder{}
+		newBuilder.joins.WriteString(b.joins.String())
+	}
+	if b.condition != nil {
+		newBuilder.condition = &strings.Builder{}
+		newBuilder.condition.WriteString(b.condition.String())
+	}
+	if b.combine != nil {
+		newBuilder.combine = &strings.Builder{}
+		newBuilder.combine.WriteString(b.combine.String())
+	}
+	if b.groupBy != nil {
+		newBuilder.groupBy = &strings.Builder{}
+		newBuilder.groupBy.WriteString(b.groupBy.String())
+	}
+	if b.orderBy != nil {
+		newBuilder.orderBy = &strings.Builder{}
+		newBuilder.orderBy.WriteString(b.orderBy.String())
+	}
+	if b.offset > 0 {
+		newBuilder.offset = b.offset
+	}
+	if b.limit > 0 {
+		newBuilder.limit = b.limit
+	}
+	newBuilder.err = b.err
+	return newBuilder
+}
+
 // Build a new string builder from the constructed query
 func (b *Builder) Build() *strings.Builder {
 	result := &strings.Builder{}
 	if b.selects != nil {
 		result.WriteString(b.selects.String())
+		result.WriteRune(' ')
 	}
 	if b.from != nil {
 		result.WriteString(b.from.String())
@@ -81,7 +123,6 @@ func (b *Builder) Select(cols ...string) *Builder {
 			b.selects.WriteRune(' ')
 		}
 	}
-	b.selects.WriteRune(' ')
 	return b
 }
 

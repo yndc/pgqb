@@ -77,3 +77,18 @@ func TestUnion(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestCopy(t *testing.T) {
+	original := pgqb.Builder{}
+	original.Select("ayy", "lmao").From("lol")
+	copy := original.Copy()
+	copy.From("yikes")
+	copy.Select("uh")
+	copy.InnerJoin("something", "something.lel = lol.lmao")
+	if original.Build().String() != "SELECT ayy, lmao FROM lol " {
+		t.Fail()
+	}
+	if copy.Build().String() != "SELECT ayy, lmao, uh FROM yikes INNER JOIN something ON something.lel = lol.lmao " {
+		t.Fail()
+	}
+}
