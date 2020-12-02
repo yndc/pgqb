@@ -60,7 +60,7 @@ func (b *Builder) Select(cols ...string) *Builder {
 		b.selects.WriteRune(',')
 	}
 	for i, v := range cols {
-		b.selects.WriteString(DoubleQuote(v))
+		b.selects.WriteString(v)
 		if i < len(cols)-1 {
 			b.selects.WriteRune(',')
 		}
@@ -73,11 +73,11 @@ func (b *Builder) Select(cols ...string) *Builder {
 func (b *Builder) From(column string) *Builder {
 	if b.from == nil {
 		b.from = &strings.Builder{}
-		b.from.WriteString("FROM ")
 	} else {
 		b.from.Reset()
 	}
-	b.from.WriteString(DoubleQuote(column))
+	b.from.WriteString("FROM ")
+	b.from.WriteString(column)
 	b.from.WriteRune(' ')
 	return b
 }

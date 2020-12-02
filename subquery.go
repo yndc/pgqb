@@ -2,15 +2,14 @@ package postgresqb
 
 import "strings"
 
-// SubQuery creates a subquery
-func SubQuery(alias string, subQueryBuilder func(builder *Builder)) string {
+// Sub creates a subquery
+func Sub(query func(builder *Builder), alias string) string {
 	builder := &Builder{}
-	subQueryBuilder(builder)
+	query(builder)
 	result := &strings.Builder{}
-	result.WriteString("( ")
+	result.WriteString("(")
 	result.WriteString(builder.Build().String())
 	result.WriteString(") AS ")
 	result.WriteString(alias)
-	result.WriteRune(' ')
 	return result.String()
 }
