@@ -1,14 +1,17 @@
 # pgqb
 
-`pgqb` (Postgres Query Builder) is a small utility library to build PostgreSQL query strings in Go.
+Warning! This is a work in progress.
+
+`pgqb` (Postgres Query Builder) is a small utility library to build PostgreSQL query strings in Go. This library is purely used for SQL string generation and paired with something like `jackc/pgx`.
 
 Features:
 
+- Simple, natural syntax
 - Supported commands: `SELECT`, `FROM`, `WHERE`, `JOIN` (INNER, LEFT, and RIGHT), `ORDER BY`, `GROUP BY`, `OFFSET`, `LIMIT`
 - SubQueries builder
 - Nested conditionals builder
 
-Please be aware that the inputs are not sanitized by default. There's a helper function to do it, `Sanitize`.
+Please be aware that the queries are not sanitized by default. There's a helper function to do it, `Sanitize`.
 
 ## Examples
 
