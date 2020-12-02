@@ -7,28 +7,6 @@ import (
 	"github.com/yndc/postgresqb"
 )
 
-func TestBuilder(t *testing.T) {
-	builder := postgresqb.Builder{}
-	builder.
-		Select("one", "two", "three").
-		From("wrong_table").
-		InnerJoin("other_table", "other_table.id = some_table.other_id").
-		InnerJoin("another_table", "another_table.id = other_table.another_id").
-		InnerJoin(postgresqb.Sub(func(builder *postgresqb.Builder) {
-			builder.Select("sqcol").
-				From("sqtable").
-				Where("sqcol2 = 'abc'").
-				Limit(1)
-		}, "sq"), "sq.sqcol = 'x'").
-		Limit(20).
-		Offset(10).
-		From("some_table").
-		Limit(100).
-		Offset(5).
-		OrderBy("id", postgresqb.FlipSortingMode("ASC"))
-	fmt.Println(builder.Build().String())
-}
-
 func TestJoin(t *testing.T) {
 	builder := postgresqb.Builder{}
 	builder.
@@ -53,5 +31,23 @@ func TestJoinSubQuery(t *testing.T) {
 		}, "sq"), "sq.sqcol = 'x'").
 		Limit(20).
 		OrderBy("id", "ASC")
+	fmt.Println(builder.Build().String())
+
+}
+
+func TestCondition(t *testing.T) {
+	builder := postgresqb.Builder{}
+	builder.
+		Select("one", "two").
+		From("some_table").
+		Where(postgresqb.Condition(func(builder *postgresqb.ConditionBuilder) {
+			builder.Or("a = 1")
+			builder.Or("b > 10")
+			builder.Or(postgresqb.Condition(func(builder *postgresqb.ConditionBuilder) {
+				builder.And("c = 0")
+				builder.And("d = 0")
+			}))
+		})).
+		Where("z = 0")
 	fmt.Println(builder.Build().String())
 }
