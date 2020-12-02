@@ -1,4 +1,4 @@
-package postgresqb
+package pgqb
 
 import "strings"
 

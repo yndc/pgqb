@@ -1,13 +1,13 @@
-package postgresqb_test
+package pgqb_test
 
 import (
 	"testing"
 
-	"github.com/yndc/postgresqb"
+	"github.com/yndc/pgqb"
 )
 
 func TestJoin(t *testing.T) {
-	builder := postgresqb.Builder{}
+	builder := pgqb.Builder{}
 	builder.
 		Select("one", "two").
 		From("some_table").
@@ -19,12 +19,12 @@ func TestJoin(t *testing.T) {
 }
 
 func TestJoinSubQuery(t *testing.T) {
-	builder := postgresqb.Builder{}
+	builder := pgqb.Builder{}
 	builder.
 		Select("one", "two").
 		From("some_table").
 		InnerJoin("other_table", "other_table.id = some_table.other_id").
-		InnerJoin(postgresqb.Sub(func(builder *postgresqb.Builder) {
+		InnerJoin(pgqb.Sub(func(builder *pgqb.Builder) {
 			builder.Select("sqcol").
 				From("sqtable").
 				Where("sqcol2 = 'abc'").
@@ -38,14 +38,14 @@ func TestJoinSubQuery(t *testing.T) {
 }
 
 func TestCondition(t *testing.T) {
-	builder := postgresqb.Builder{}
+	builder := pgqb.Builder{}
 	builder.
 		Select("one", "two").
 		From("some_table").
-		Where(postgresqb.Condition(func(builder *postgresqb.ConditionBuilder) {
+		Where(pgqb.Condition(func(builder *pgqb.ConditionBuilder) {
 			builder.Or("a = 1")
 			builder.Or("b > 10")
-			builder.Or(postgresqb.Condition(func(builder *postgresqb.ConditionBuilder) {
+			builder.Or(pgqb.Condition(func(builder *pgqb.ConditionBuilder) {
 				builder.And("c = 0")
 				builder.And("d = 0")
 			}))

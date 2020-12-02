@@ -1,6 +1,6 @@
-# postgresqb
+# pgqb
 
-`postgresqb` (Postgres Query Builder) is a small utility library to build PostgreSQL query strings in Go.
+`pgqb` (Postgres Query Builder) is a small utility library to build PostgreSQL query strings in Go.
 
 Features:
 
@@ -15,7 +15,7 @@ Please be aware that the inputs are not sanitized by default. There's a helper f
 ### Basic `SELECT` query
 
 ```golang
-builder := postgresqb.Builder{}
+builder := pgqb.Builder{}
 builder.Select("one", "two").From("some_table")
 ```
 
@@ -26,7 +26,7 @@ SELECT one,two FROM some_table
 ### Multiple Joins
 
 ```golang
-builder := postgresqb.Builder{}
+builder := pgqb.Builder{}
 builder.
     Select("one", "two").
     From("some_table").
@@ -41,12 +41,12 @@ SELECT one, two FROM some_table INNER JOIN other_table ON other_table.id = some_
 ### Joins with SubQuery
 
 ```golang
-builder := postgresqb.Builder{}
+builder := pgqb.Builder{}
 builder.
     Select("one", "two").
     From("some_table").
     InnerJoin("other_table", "other_table.id = some_table.other_id").
-    InnerJoin(postgresqb.Sub(func(builder *postgresqb.Builder) {
+    InnerJoin(pgqb.Sub(func(builder *pgqb.Builder) {
         builder.
             Select("sqcol").
             From("sqtable").
@@ -64,14 +64,14 @@ SELECT one, two FROM some_table INNER JOIN other_table ON other_table.id = some_
 ### Nested conditionals
 
 ```golang
-builder := postgresqb.Builder{}
+builder := pgqb.Builder{}
 builder.
     Select("one", "two").
     From("some_table").
-    Where(postgresqb.Condition(func(builder *postgresqb.ConditionBuilder) {
+    Where(pgqb.Condition(func(builder *pgqb.ConditionBuilder) {
         builder.Or("a = 1")
         builder.Or("b > 10")
-        builder.Or(postgresqb.Condition(func(builder *postgresqb.ConditionBuilder) {
+        builder.Or(pgqb.Condition(func(builder *pgqb.ConditionBuilder) {
             builder.And("c = 0")
             builder.And("d = 0")
         }))
