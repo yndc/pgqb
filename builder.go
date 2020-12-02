@@ -49,6 +49,12 @@ func (b *Builder) Build() *strings.Builder {
 	return result
 }
 
+// SubQueryString builds this query as a subquery string
+func (b *Builder) SubQueryString(alias string) string {
+	s := b.Build()
+	return fmt.Sprintf("( %s ) AS %s", s.String(), alias)
+}
+
 // Select add a select to the query
 func (b *Builder) Select(cols ...string) *Builder {
 	if b.selects == nil {
