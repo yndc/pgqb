@@ -7,7 +7,7 @@ Features:
 - Supported commands: `SELECT`, `FROM`, `WHERE`, `JOIN` (INNER, LEFT, and RIGHT), `ORDER BY`, `GROUP BY`, `OFFSET`, `LIMIT`
 - SubQueries
 
-Please be aware that the inputs are not sanitized. There's a helper function to do it, `Sanitize`.
+Please be aware that the inputs are not sanitized by default. There's a helper function to do it, `Sanitize`.
 
 ## Examples
 
