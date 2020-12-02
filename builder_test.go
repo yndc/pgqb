@@ -13,7 +13,7 @@ func TestJoin(t *testing.T) {
 		From("some_table").
 		InnerJoin("other_table", "other_table.id = some_table.other_id").
 		InnerJoin("another_table", "another_table.id = other_table.another_id")
-	if builder.Build().String() != " SELECT one, two FROM some_table INNER JOIN other_table ON other_table.id = some_table.other_id INNER JOIN another_table ON another_table.id = other_table.another_id " {
+	if builder.Build().String() != "SELECT one, two FROM some_table INNER JOIN other_table ON other_table.id = some_table.other_id INNER JOIN another_table ON another_table.id = other_table.another_id " {
 		t.Fail()
 	}
 }
@@ -32,7 +32,7 @@ func TestJoinSubQuery(t *testing.T) {
 		}, "sq"), "sq.sqcol = 'x'").
 		Limit(20).
 		OrderBy("id", "ASC")
-	if builder.Build().String() != " SELECT one, two FROM some_table INNER JOIN other_table ON other_table.id = some_table.other_id INNER JOIN ( SELECT sqcol FROM sqtable WHERE sqcol2 = 'abc' LIMIT 1 ) AS sq ON sq.sqcol = 'x' ORDER BY id ASC LIMIT 20 " {
+	if builder.Build().String() != "SELECT one, two FROM some_table INNER JOIN other_table ON other_table.id = some_table.other_id INNER JOIN ( SELECT sqcol FROM sqtable WHERE sqcol2 = 'abc' LIMIT 1 ) AS sq ON sq.sqcol = 'x' ORDER BY id ASC LIMIT 20 " {
 		t.Fail()
 	}
 }
@@ -51,7 +51,29 @@ func TestCondition(t *testing.T) {
 			}))
 		})).
 		Where("z = 0")
-	if builder.Build().String() != " SELECT one, two FROM some_table WHERE ( a = 1 OR b > 10 OR ( c = 0 AND d = 0 ) ) AND z = 0 " {
+	if builder.Build().String() != "SELECT one, two FROM some_table WHERE ( a = 1 OR b > 10 OR ( c = 0 AND d = 0 ) ) AND z = 0 " {
+		t.Fail()
+	}
+}
+
+func TestUnion(t *testing.T) {
+	builder := pgqb.Builder{}
+	builder.Select("one", "two")
+	builder.From("some_table")
+	builder.Where(pgqb.Condition(func(builder *pgqb.ConditionBuilder) {
+		builder.Or("a = 1")
+		builder.Or("b > 10")
+		builder.Or(pgqb.Condition(func(builder *pgqb.ConditionBuilder) {
+			builder.And("c = 0")
+			builder.And("d = 0")
+		}))
+	}))
+	builder.Where("z = 0")
+	builder.OrderBy("one", "ASC")
+	builder.GroupBy("one")
+	builder.Limit(10)
+	builder.Union(pgqb.NewBuilder().Select("one", "two").From("another_one").Build().String())
+	if builder.Build().String() != "SELECT one, two FROM some_table WHERE ( a = 1 OR b > 10 OR ( c = 0 AND d = 0 ) ) AND z = 0 UNION SELECT one, two FROM another_one GROUP BY one ORDER BY one ASC LIMIT 10 " {
 		t.Fail()
 	}
 }

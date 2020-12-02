@@ -11,6 +11,7 @@ type Builder struct {
 	from      *strings.Builder
 	joins     *strings.Builder
 	condition *strings.Builder
+	combine   *strings.Builder
 	groupBy   *strings.Builder
 	orderBy   *strings.Builder
 	offset    uint
@@ -18,10 +19,14 @@ type Builder struct {
 	err       error
 }
 
+// NewBuilder creates a new builder
+func NewBuilder() *Builder {
+	return &Builder{}
+}
+
 // Build a new string builder from the constructed query
 func (b *Builder) Build() *strings.Builder {
 	result := &strings.Builder{}
-	result.WriteRune(' ')
 	if b.selects != nil {
 		result.WriteString(b.selects.String())
 	}
@@ -33,6 +38,9 @@ func (b *Builder) Build() *strings.Builder {
 	}
 	if b.condition != nil {
 		result.WriteString(b.condition.String())
+	}
+	if b.combine != nil {
+		result.WriteString(b.combine.String())
 	}
 	if b.groupBy != nil {
 		result.WriteString(b.groupBy.String())
@@ -148,6 +156,26 @@ func (b *Builder) LeftJoin(targetTable string, on string) *Builder {
 // RightJoin adds an inner join query
 func (b *Builder) RightJoin(targetTable string, on string) *Builder {
 	return b.Join("RIGHT", targetTable, on)
+}
+
+// Union adds another query to union
+func (b *Builder) Union(other string) *Builder {
+	if b.combine == nil {
+		b.combine = &strings.Builder{}
+	}
+	b.combine.WriteString("UNION ")
+	b.combine.WriteString(other)
+	return b
+}
+
+// Intersect adds another query to intercept
+func (b *Builder) Intersect(other string) *Builder {
+	if b.combine == nil {
+		b.combine = &strings.Builder{}
+	}
+	b.combine.WriteString("INTERSECT ")
+	b.combine.WriteString(other)
+	return b
 }
 
 // OrderBy adds an order by query
