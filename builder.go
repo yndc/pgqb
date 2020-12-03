@@ -261,15 +261,3 @@ func (b *Builder) Limit(n uint) *Builder {
 	b.limit = n
 	return b
 }
-
-// FlipSortingMode flips.. sorting mode
-func FlipSortingMode(str string) string {
-	switch str {
-	case "ASC":
-		return "DESC"
-	case "DESC":
-		return "ASC"
-	default:
-		return "DESC"
-	}
-}
