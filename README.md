@@ -52,7 +52,7 @@ builder.
     InnerJoin(pgqb.Sub(func(builder *pgqb.Builder) {
         builder.
             Select("sqcol").
-            From("sqtable").
+            From("sqtable"). 
             Where("sqcol2 = 'abc'").
             Limit(1)
     }, "sq"), "sq.sqcol = 'x'").
