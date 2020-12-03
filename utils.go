@@ -27,6 +27,14 @@ func FlipComparisonOperator(op string) string {
 		return "!="
 	case "!=":
 		return "="
+	case "IS NULL":
+		return "IS NOT NULL"
+	case "IS NOT NULL":
+		return "IS NULL"
+	case "TRUE":
+		return "FALSE"
+	case "FALSE":
+		return "TRUE"
 	default:
 		return op
 	}
