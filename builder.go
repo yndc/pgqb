@@ -178,8 +178,10 @@ func (b *Builder) Join(joinType string, targetTable string, on string) *Builder 
 	b.joins.WriteString(joinType)
 	b.joins.WriteString(" JOIN ")
 	b.joins.WriteString(targetTable)
-	b.joins.WriteString(" ON ")
-	b.joins.WriteString(on)
+	if on != "" {
+		b.joins.WriteString(" ON ")
+		b.joins.WriteString(on)
+	}
 	b.joins.WriteRune(' ')
 	return b
 }
