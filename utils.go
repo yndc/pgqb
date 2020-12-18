@@ -12,8 +12,8 @@ func FlipSortingMode(str string) string {
 	}
 }
 
-// FlipComparisonOperator flips comparison operator
-func FlipComparisonOperator(op string) string {
+// InvertOperator flips comparison operator
+func InvertOperator(op string) string {
 	switch op {
 	case ">":
 		return "<"
