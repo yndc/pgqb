@@ -289,3 +289,21 @@ func (b *Builder) With(alias string, query func(builder *Builder)) *Builder {
 	b.ctes.WriteString(") ")
 	return b
 }
+
+// With add a CTE to the query
+func (b *Builder) WithStr(alias string, queryStr string) *Builder {
+	if b.ctes == nil {
+		b.ctes = &strings.Builder{}
+		b.ctes.WriteString("WITH ")
+	} else if b.ctes.Len() == 0 {
+		b.ctes.WriteString("WITH ")
+	} else {
+		b.ctes.WriteRune(',')
+		b.ctes.WriteRune(' ')
+	}
+	b.ctes.WriteString(alias)
+	b.ctes.WriteString(" AS ( ")
+	b.ctes.WriteString(queryStr)
+	b.ctes.WriteString(") ")
+	return b
+}
