@@ -1,6 +1,7 @@
 package pgqb_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/yndc/pgqb"
@@ -89,6 +90,33 @@ func TestCopy(t *testing.T) {
 		t.Fail()
 	}
 	if copy.Build().String() != "SELECT ayy, lmao, uh FROM yikes INNER JOIN something ON something.lel = lol.lmao " {
+		t.Fail()
+	}
+}
+
+func TestCte(t *testing.T) {
+	builder := pgqb.Builder{}
+	builder.
+		With("first", func(builder *pgqb.Builder) {
+			builder.Select("first", "stuff").From("first_table")
+		}).
+		With("second", func(builder *pgqb.Builder) {
+			builder.Select("second", "stuff").From("second_table")
+		}).
+		Select("first", "second").
+		From("first").
+		InnerJoin("second", "first.stuff = second.stuff").
+		InnerJoin(pgqb.Sub(func(builder *pgqb.Builder) {
+			builder.Select("third").
+				From("third").
+				Where("sqcol2 = 'abc'").
+				Limit(1)
+		}, "sq"), "sq.sqcol = 'x'").
+		Limit(20).
+		OrderBy("id", "ASC")
+
+	fmt.Println(builder.Build().String())
+	if builder.Build().String() != "SELECT one, two FROM some_table INNER JOIN other_table ON other_table.id = some_table.other_id INNER JOIN ( SELECT sqcol FROM sqtable WHERE sqcol2 = 'abc' LIMIT 1 ) AS sq ON sq.sqcol = 'x' ORDER BY id ASC LIMIT 20 " {
 		t.Fail()
 	}
 }

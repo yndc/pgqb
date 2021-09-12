@@ -14,6 +14,7 @@ type Builder struct {
 	combine   *strings.Builder
 	groupBy   *strings.Builder
 	orderBy   *strings.Builder
+	ctes      *strings.Builder
 	offset    uint
 	limit     uint
 	err       error
@@ -55,6 +56,10 @@ func (b *Builder) Copy() *Builder {
 		newBuilder.orderBy = &strings.Builder{}
 		newBuilder.orderBy.WriteString(b.orderBy.String())
 	}
+	if b.ctes != nil {
+		newBuilder.ctes = &strings.Builder{}
+		newBuilder.ctes.WriteString(b.ctes.String())
+	}
 	if b.offset > 0 {
 		newBuilder.offset = b.offset
 	}
@@ -68,6 +73,9 @@ func (b *Builder) Copy() *Builder {
 // Build a new string builder from the constructed query
 func (b *Builder) Build() *strings.Builder {
 	result := &strings.Builder{}
+	if b.ctes != nil {
+		result.WriteString(b.ctes.String())
+	}
 	if b.selects != nil {
 		result.WriteString(b.selects.String())
 		result.WriteRune(' ')
@@ -228,9 +236,9 @@ func (b *Builder) OrderBy(str string, mode string) *Builder {
 		b.orderBy.WriteRune(',')
 		b.orderBy.WriteRune(' ')
 	}
-	fmt.Fprintf(b.orderBy, str)
+	fmt.Fprint(b.orderBy, str)
 	b.orderBy.WriteRune(' ')
-	fmt.Fprintf(b.orderBy, mode)
+	fmt.Fprint(b.orderBy, mode)
 	b.orderBy.WriteRune(' ')
 	return b
 }
@@ -243,7 +251,7 @@ func (b *Builder) GroupBy(str string) *Builder {
 	} else {
 		b.groupBy.WriteString(", ")
 	}
-	fmt.Fprintf(b.groupBy, str)
+	fmt.Fprint(b.groupBy, str)
 	b.groupBy.WriteRune(' ')
 	return b
 }
@@ -259,5 +267,25 @@ func (b *Builder) Offset(n uint) *Builder {
 // If a limit is already set before, the value will be overwritten
 func (b *Builder) Limit(n uint) *Builder {
 	b.limit = n
+	return b
+}
+
+// With add a CTE to the query
+func (b *Builder) With(alias string, query func(builder *Builder)) *Builder {
+	builder := &Builder{}
+	query(builder)
+	if b.ctes == nil {
+		b.ctes = &strings.Builder{}
+		b.ctes.WriteString("WITH ")
+	} else if b.ctes.Len() == 0 {
+		b.ctes.WriteString("WITH ")
+	} else {
+		b.ctes.WriteRune(',')
+		b.ctes.WriteRune(' ')
+	}
+	b.ctes.WriteString(alias)
+	b.ctes.WriteString(" AS ( ")
+	b.ctes.WriteString(builder.Build().String())
+	b.ctes.WriteString(") ")
 	return b
 }
