@@ -89,9 +89,6 @@ func (b *Builder) Build() *strings.Builder {
 	if b.condition != nil {
 		result.WriteString(b.condition.String())
 	}
-	if b.combine != nil {
-		result.WriteString(b.combine.String())
-	}
 	if b.groupBy != nil {
 		result.WriteString(b.groupBy.String())
 	}
@@ -103,6 +100,9 @@ func (b *Builder) Build() *strings.Builder {
 	}
 	if b.limit > 0 {
 		fmt.Fprintf(result, "LIMIT %d ", b.limit)
+	}
+	if b.combine != nil {
+		result.WriteString(b.combine.String())
 	}
 	return result
 }
