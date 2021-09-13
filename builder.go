@@ -44,10 +44,6 @@ func (b *Builder) Copy() *Builder {
 		newBuilder.condition = &strings.Builder{}
 		newBuilder.condition.WriteString(b.condition.String())
 	}
-	if b.combine != nil {
-		newBuilder.combine = &strings.Builder{}
-		newBuilder.combine.WriteString(b.combine.String())
-	}
 	if b.groupBy != nil {
 		newBuilder.groupBy = &strings.Builder{}
 		newBuilder.groupBy.WriteString(b.groupBy.String())
@@ -65,6 +61,10 @@ func (b *Builder) Copy() *Builder {
 	}
 	if b.limit > 0 {
 		newBuilder.limit = b.limit
+	}
+	if b.combine != nil {
+		newBuilder.combine = &strings.Builder{}
+		newBuilder.combine.WriteString(b.combine.String())
 	}
 	newBuilder.err = b.err
 	return newBuilder
